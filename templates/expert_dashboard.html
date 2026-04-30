@@ -1,0 +1,149 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+  .expert-hero { background:linear-gradient(135deg,#064e3b 0%,#059669 100%); color:white; padding:52px 0; }
+  .expert-hero h1 { font-weight:900; font-size:2rem; letter-spacing:-.5px; }
+  .stat-card { background:white; border:1px solid var(--gray-200); border-radius:20px; padding:24px; text-align:center; box-shadow:var(--shadow-sm); transition:all .25s; }
+  .stat-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-md); }
+  .stat-number { font-size:2.4rem; font-weight:900; letter-spacing:-1px; color:#059669; }
+  .stat-label  { color:var(--gray-500); font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; margin-top:4px; }
+  .section-bar { border-left:4px solid #059669; padding-left:14px; margin-bottom:20px; }
+  .section-bar h4 { font-weight:800; color:var(--gray-800); margin:0; font-size:1.1rem; }
+  .qa-form-wrap { background:linear-gradient(135deg,#f0fdf4 0%,#d1fae5 100%); border-radius:20px; padding:32px; border:1px solid #6ee7b7; margin-bottom:36px; }
+  .qa-form-wrap .form-control, .qa-form-wrap .form-select { border-color:#a7f3d0; }
+  .qa-form-wrap .form-control:focus { border-color:#059669; box-shadow:0 0 0 3px rgba(5,150,105,.15); }
+  .btn-expert { background:#059669; color:white; border:none; padding:11px 28px; border-radius:50px; font-weight:700; cursor:pointer; transition:.25s; }
+  .btn-expert:hover { background:#047857; transform:translateY(-2px); box-shadow:0 6px 18px rgba(5,150,105,.3); color:white; }
+  .unanswered-card { background:white; border:1px solid var(--gray-200); border-left:4px solid #f59e0b; border-radius:14px; padding:20px 22px; margin-bottom:14px; transition:.25s; }
+  .unanswered-card:hover { box-shadow:var(--shadow-md); transform:translateY(-2px); }
+  .qa-record { background:white; border:1px solid var(--gray-200); border-radius:14px; padding:20px 22px; margin-bottom:12px; }
+  .qa-record .q-text { font-weight:700; color:var(--primary); font-size:.92rem; margin-bottom:6px; }
+  .qa-record .a-text { color:var(--gray-500); font-size:.88rem; line-height:1.6; margin-bottom:8px; }
+  .kw-tag { display:inline-flex; align-items:center; gap:4px; background:var(--primary-light); color:var(--primary); border-radius:50px; padding:3px 10px; font-size:.75rem; font-weight:600; margin:2px; }
+  .empty-alert { border-radius:14px; font-weight:500; }
+  [data-theme="dark"] .stat-card { background:#1e293b; border-color:#334155; }
+  [data-theme="dark"] .section-bar h4 { color:#e2e8f0; }
+  [data-theme="dark"] .qa-form-wrap { background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%); border-color:#065f46; }
+  [data-theme="dark"] .qa-form-wrap .form-control, [data-theme="dark"] .qa-form-wrap .form-select { border-color:#334155; }
+  [data-theme="dark"] .unanswered-card { background:#1e293b; border-color:#334155; border-left-color:#f59e0b; }
+  [data-theme="dark"] .unanswered-card p.fw-bold { color:#e2e8f0 !important; }
+  [data-theme="dark"] .qa-record { background:#1e293b; border-color:#334155; }
+  [data-theme="dark"] .qa-record .q-text { color:#60a5fa; }
+  [data-theme="dark"] .qa-record .a-text { color:#94a3b8; }
+  [data-theme="dark"] .kw-tag { background:rgba(59,130,246,.15); color:#93c5fd; }
+</style>
+<div class="expert-hero">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+      <div>
+        <p class="mb-1 small text-uppercase fw-semibold" style="color:rgba(255,255,255,.6);letter-spacing:.5px;"><i class="bi bi-person-badge me-1"></i>Expert Panel</p>
+        <h1><i class="bi bi-clipboard2-pulse me-2"></i>Expert Dashboard</h1>
+        <p class="mb-0" style="color:rgba(255,255,255,.7);">Dr. {{ current_user.fname }} {{ current_user.lname }} — Manage questions and share your expertise</p>
+      </div>
+      {% if unread_count > 0 %}
+      <a href="{{ url_for('notifications') }}" class="btn btn-light fw-bold rounded-pill px-4 position-relative">
+        <i class="bi bi-bell-fill me-2"></i>Notifications
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ unread_count }}</span>
+      </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+<div class="container py-5">
+  <div class="row g-4 mb-5">
+    <div class="col-md-4">
+      <div class="stat-card">
+        <div style="font-size:2rem;margin-bottom:8px;"><i class="bi bi-hourglass-split" style="color:#f59e0b;"></i></div>
+        <div class="stat-number" style="color:#f59e0b;">{{ unanswered_questions|length }}</div>
+        <div class="stat-label">Pending Questions</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="stat-card">
+        <div style="font-size:2rem;margin-bottom:8px;"><i class="bi bi-collection-fill" style="color:#059669;"></i></div>
+        <div class="stat-number">{{ all_qas|length }}</div>
+        <div class="stat-label">Total Q&amp;As</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="stat-card">
+        <div style="font-size:2rem;margin-bottom:8px;"><i class="bi bi-patch-check-fill" style="color:#2563eb;"></i></div>
+        <div class="stat-number" style="color:#2563eb;">{{ all_qas|selectattr('answered_by','equalto',current_user.id)|list|length }}</div>
+        <div class="stat-label">Your Answers</div>
+      </div>
+    </div>
+  </div>
+  <div class="section-bar mb-3"><h4><i class="bi bi-plus-circle-fill me-2"></i>Add New Q&amp;A to Knowledge Base</h4></div>
+  <div class="qa-form-wrap">
+    <form method="POST" id="addQAForm">
+      {{ form.hidden_tag() }}
+      <div class="mb-3">
+        {{ form.question_text.label(class="form-label") }}
+        {% if form.question_text.errors %}
+          {{ form.question_text(class="form-control is-invalid", rows="3", placeholder="Enter the question…", id="qaQuestion") }}
+          <div class="invalid-feedback">{% for e in form.question_text.errors %}<span>{{ e }}</span>{% endfor %}</div>
+        {% else %}
+          {{ form.question_text(class="form-control", rows="3", placeholder="Enter the question…", id="qaQuestion") }}
+        {% endif %}
+      </div>
+      <div class="mb-3">
+        {{ form.keywords.label(class="form-label") }}
+        {% if form.keywords.errors %}
+          {{ form.keywords(class="form-control is-invalid", placeholder="e.g. diet, nutrition, smoking, exercise", id="qaKeywords") }}
+          <div class="invalid-feedback">{% for e in form.keywords.errors %}<span>{{ e }}</span>{% endfor %}</div>
+        {% else %}
+          {{ form.keywords(class="form-control", placeholder="e.g. diet, nutrition, smoking, exercise", id="qaKeywords") }}
+        {% endif %}
+        <div class="form-text"><i class="bi bi-info-circle me-1"></i>Comma-separated — helps patients find this Q&amp;A by keyword search.</div>
+      </div>
+      <div class="mb-4">
+        {{ form.answer_text.label(class="form-label") }}
+        {% if form.answer_text.errors %}
+          {{ form.answer_text(class="form-control is-invalid", rows="5", placeholder="Provide a detailed, evidence-based answer…", id="qaAnswer") }}
+          <div class="invalid-feedback">{% for e in form.answer_text.errors %}<span>{{ e }}</span>{% endfor %}</div>
+        {% else %}
+          {{ form.answer_text(class="form-control", rows="5", placeholder="Provide a detailed, evidence-based answer…", id="qaAnswer") }}
+        {% endif %}
+      </div>
+      {{ form.submit(class="btn-expert", id="addQABtn") }}
+    </form>
+  </div>
+  <div class="section-bar mt-4 mb-3"><h4><i class="bi bi-question-circle-fill text-warning me-2"></i>Unanswered Patient Questions</h4></div>
+  {% if unanswered_questions %}
+    {% for q in unanswered_questions %}
+    <div class="unanswered-card">
+      <div class="d-flex justify-content-between align-items-start gap-3">
+        <div class="flex-grow-1">
+          <p class="fw-bold mb-1" style="color:var(--gray-800);">{{ q.question_text }}</p>
+          <small class="text-muted">
+            <i class="bi bi-clock me-1"></i>{{ q.date_posted.strftime('%B %d, %Y at %I:%M %p') }}
+            {% if q.user_id %} · by <strong>{{ q.asker.username }}</strong>{% endif %}
+          </small>
+        </div>
+        <a href="{{ url_for('answer_question', question_id=q.id) }}" class="btn-expert flex-shrink-0" id="answerQ{{ q.id }}">
+          <i class="bi bi-reply-fill me-1"></i>Answer
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="alert alert-success empty-alert"><i class="bi bi-check-circle-fill me-2"></i>All patient questions have been answered — great work!</div>
+  {% endif %}
+  <div class="section-bar mt-5 mb-3"><h4><i class="bi bi-database-fill me-2"></i>Q&amp;A Knowledge Base</h4></div>
+  {% if all_qas %}
+    {% for qa in all_qas %}
+    <div class="qa-record">
+      <div class="q-text"><i class="bi bi-patch-question-fill me-1"></i>{{ qa.question_text }}</div>
+      <div class="a-text">{{ qa.answer_text[:160] }}{% if qa.answer_text|length > 160 %}…{% endif %}</div>
+      <div>
+        {% for kw in qa.keywords.split(',') %}
+          <span class="kw-tag"><i class="bi bi-tag"></i>{{ kw.strip() }}</span>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="alert alert-info empty-alert"><i class="bi bi-info-circle-fill me-2"></i>No Q&amp;As yet — add your first one above!</div>
+  {% endif %}
+</div>
+{% endblock %}

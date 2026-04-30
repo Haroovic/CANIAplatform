@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+  .vq-page  { background:var(--gray-50); min-height:80vh; padding:52px 0; }
+  .vq-card  { max-width:760px; margin:0 auto; background:white; border-radius:24px; box-shadow:var(--shadow-lg); border:1px solid var(--gray-200); overflow:hidden; }
+  .vq-header { background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%); color:white; padding:32px 36px; }
+  .vq-header .chip { display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); border-radius:50px; padding:5px 14px; font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.4px; margin-bottom:14px; }
+  .vq-header h2 { font-weight:800; font-size:1.35rem; line-height:1.4; margin:0; }
+  .vq-meta  { margin-top:12px; font-size:.8rem; color:rgba(255,255,255,.55); display:flex; gap:16px; flex-wrap:wrap; }
+  .vq-body  { padding:36px; }
+  .answer-wrap { background:linear-gradient(135deg,var(--primary-light) 0%,#e0eaff 100%); border:1px solid #c7d7fa; border-radius:16px; padding:26px 28px; }
+  .answer-label { font-size:.75rem; font-weight:800; text-transform:uppercase; letter-spacing:.5px; color:var(--primary); margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+  .answer-text  { font-size:.97rem; color:var(--gray-700); line-height:1.8; white-space:pre-wrap; }
+  .expert-chip  { display:inline-flex; align-items:center; gap:8px; background:var(--primary-light); color:var(--primary); border-radius:50px; padding:6px 16px; font-size:.82rem; font-weight:700; margin-top:20px; }
+  .kw-wrap { margin-top:20px; }
+  .kw-tag  { display:inline-flex; align-items:center; gap:4px; background:var(--gray-100); color:var(--gray-600); border-radius:50px; padding:3px 11px; font-size:.75rem; font-weight:600; margin:3px; }
+  .answered-date { font-size:.8rem; color:var(--gray-400); margin-top:14px; }
+  [data-theme="dark"] .vq-page { background: #0f172a; }
+  [data-theme="dark"] .vq-card { background: #1e293b; border-color: #334155; }
+  [data-theme="dark"] .answer-wrap { background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.5) 100%); border-color: #334155; }
+  [data-theme="dark"] .answer-text { color: #cbd5e1; }
+  [data-theme="dark"] .kw-tag { background: #0f172a; color: #94a3b8; }
+  [data-theme="dark"] .answer-label { color: #38bdf8; }
+</style>
+<div class="vq-page">
+  <div class="container">
+    <div class="vq-card">
+      <div class="vq-header">
+        <div class="chip"><i class="bi bi-patch-question-fill"></i> Patient Question</div>
+        <h2>{{ question.question_text }}</h2>
+        <div class="vq-meta">
+          <span><i class="bi bi-calendar3 me-1"></i>Asked {{ question.date_posted.strftime('%B %d, %Y') }}</span>
+          {% if question.user_id %}
+            <span><i class="bi bi-person me-1"></i>{{ question.asker.username }}</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="vq-body">
+        {% if question.is_answered %}
+          <div class="answer-wrap">
+            <div class="answer-label"><i class="bi bi-shield-check-fill"></i> Expert Answer</div>
+            <div class="answer-text">{{ question.answer_text }}</div>
+          </div>
+          {% if question.keywords %}
+          <div class="kw-wrap">
+            <div class="answer-label mt-3"><i class="bi bi-tags-fill"></i> Keywords</div>
+            {% for kw in question.keywords.split(',') %}
+              <span class="kw-tag"><i class="bi bi-tag"></i>{{ kw.strip() }}</span>
+            {% endfor %}
+          </div>
+          {% endif %}
+          {% if question.date_answered %}
+          <p class="answered-date">
+            <i class="bi bi-clock-history me-1"></i>
+            Answered on {{ question.date_answered.strftime('%B %d, %Y at %I:%M %p') }}
+          </p>
+          {% endif %}
+        {% else %}
+          <div class="text-center py-5">
+            <i class="bi bi-hourglass-split text-warning d-block mb-3" style="font-size:3rem;"></i>
+            <h5 class="fw-bold">Awaiting Expert Response</h5>
+            <p class="text-muted mb-0">Our medical experts have been notified and will respond within 24–48 hours.</p>
+          </div>
+        {% endif %}
+        <div class="mt-4 pt-3 border-top d-flex gap-3 flex-wrap">
+          <a href="{{ url_for('cania_space') }}" class="btn btn-outline-primary rounded-pill px-4 fw-semibold">
+            <i class="bi bi-arrow-left me-1"></i>Back to CANIA Space
+          </a>
+          <a href="{{ url_for('dashboard') }}" class="btn btn-primary rounded-pill px-4 fw-semibold">
+            <i class="bi bi-grid me-1"></i>My Dashboard
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,634 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+    :root {
+        --cania-blue: #0d6efd;
+        --help-green: #059669;
+        --text-main: #1e293b;
+        --text-sub: #64748b;
+    }
+    .help-hero {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+        color: white;
+        padding: 70px 0 50px 0;
+    }
+    .help-hero h1 {
+        font-size: 3rem;
+        font-weight: 900;
+        margin-bottom: 15px;
+    }
+    .help-search {
+        max-width: 600px;
+        margin: 30px auto 0;
+        position: relative;
+    }
+    .help-search input {
+        width: 100%;
+        padding: 18px 60px 18px 25px;
+        border: none;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .help-search i {
+        position: absolute;
+        right: 25px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.3rem;
+        color: var(--text-sub);
+    }
+    .quick-links {
+        padding: 50px 0;
+        background: #f8fafc;
+    }
+    .quick-link-card {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        text-align: center;
+        border: 2px solid #e2e8f0;
+        transition: 0.3s;
+        height: 100%;
+        text-decoration: none;
+        display: block;
+    }
+    .quick-link-card:hover {
+        border-color: var(--cania-blue);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(13, 110, 253, 0.1);
+        text-decoration: none;
+    }
+    .quick-link-card i {
+        font-size: 3rem;
+        color: var(--cania-blue);
+        margin-bottom: 15px;
+        display: block;
+    }
+    .quick-link-card h4 {
+        color: var(--text-main);
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    .quick-link-card p {
+        color: var(--text-sub);
+        font-size: 0.95rem;
+        margin: 0;
+    }
+    .help-section {
+        padding: 60px 0;
+    }
+    .section-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--text-main);
+        margin-bottom: 15px;
+        display: inline-block;
+        position: relative;
+    }
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 50px;
+        height: 4px;
+        background: var(--cania-blue);
+        border-radius: 2px;
+    }
+    .step-card {
+        background: white;
+        border-radius: 16px;
+        padding: 35px;
+        border-left: 4px solid var(--cania-blue);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        margin-bottom: 25px;
+    }
+    .step-number {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+    }
+    .step-card h4 {
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 10px;
+    }
+    .step-card p {
+        color: var(--text-sub);
+        margin: 0;
+        line-height: 1.6;
+    }
+    .faq-accordion .accordion-item {
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        overflow: hidden;
+    }
+    .faq-accordion .accordion-button {
+        font-weight: 700;
+        color: var(--text-main);
+        background: white;
+        padding: 20px 25px;
+    }
+    .faq-accordion .accordion-button:not(.collapsed) {
+        background: linear-gradient(135deg, #e7f1ff 0%, #cfe2ff 100%);
+        color: var(--cania-blue);
+    }
+    .faq-accordion .accordion-button:focus {
+        box-shadow: none;
+        border-color: var(--cania-blue);
+    }
+    .faq-accordion .accordion-body {
+        padding: 25px;
+        color: var(--text-sub);
+        line-height: 1.7;
+    }
+    .support-box {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        border: 2px solid #86efac;
+        border-radius: 20px;
+        padding: 40px;
+        text-align: center;
+    }
+    .support-box h3 {
+        color: var(--help-green);
+        font-weight: 800;
+        margin-bottom: 15px;
+    }
+    .support-box p {
+        color: var(--text-sub);
+        margin-bottom: 25px;
+    }
+    .contact-links {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .contact-btn {
+        background: white;
+        color: var(--help-green);
+        border: 2px solid var(--help-green);
+        padding: 12px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .contact-btn:hover {
+        background: var(--help-green);
+        color: white;
+    }
+    .info-alert {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+    }
+    .info-alert i {
+        color: #856404;
+        font-size: 1.2rem;
+        margin-right: 10px;
+    }
+    .info-alert strong {
+        color: #856404;
+    }
+    [data-theme="dark"] .quick-link-card { background: #1e293b; border-color: #334155; }
+    [data-theme="dark"] .quick-link-card h4 { color: #f1f5f9; }
+    [data-theme="dark"] .step-card { background: #1e293b; border-left-color: var(--cania-blue); box-shadow: none; border: 1px solid #334155; border-left-width: 4px; }
+    [data-theme="dark"] .step-card h4 { color: #f1f5f9; }
+    [data-theme="dark"] .faq-accordion .accordion-item { border-color: #334155; }
+    [data-theme="dark"] .faq-accordion .accordion-button { background: #1e293b; color: #f1f5f9; }
+    [data-theme="dark"] .faq-accordion .accordion-button:not(.collapsed) { background: rgba(59,130,246,.15); color: #93c5fd; }
+    [data-theme="dark"] .faq-accordion .accordion-body { background: #1e293b; color: #cbd5e1; }
+    [data-theme="dark"] .support-box { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-color: #065f46; }
+    [data-theme="dark"] .contact-btn { background: #1e293b; color: #86efac; }
+    [data-theme="dark"] .info-alert { background: rgba(217,119,6,.15); border-left-color: #d97706; color: #fcd34d; }
+    [data-theme="dark"] .info-alert strong { color: #fde68a; }
+    [data-theme="dark"] .info-alert i { color: #f59e0b; }
+    [data-theme="dark"] .section-title { color: #f1f5f9; }
+    [data-theme="dark"] .help-search input { background: #1e293b; color: #f1f5f9; }
+    [data-theme="dark"] .help-search input::placeholder { color: #64748b; }
+    [data-theme="dark"] .quick-links { background: transparent; }
+</style>
+<div class="help-hero">
+    <div class="container text-center">
+        <h1>How Can We Help You?</h1>
+        <p class="lead">Find answers, learn how to use CANIA, and get support</p>
+        <div class="help-search">
+            <input type="text" placeholder="Search for help..." id="helpSearch">
+            <i class="bi bi-search"></i>
+        </div>
+    </div>
+</div>
+<section class="quick-links">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <a href="#getting-started" class="quick-link-card">
+                    <i class="bi bi-rocket-takeoff"></i>
+                    <h4>Getting Started</h4>
+                    <p>Create account & login</p>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <a href="#for-patients" class="quick-link-card">
+                    <i class="bi bi-person-heart"></i>
+                    <h4>For Patients</h4>
+                    <p>Using scanner & CANIA Space</p>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <a href="#for-experts" class="quick-link-card">
+                    <i class="bi bi-clipboard2-pulse"></i>
+                    <h4>For Experts</h4>
+                    <p>Answer questions & add Q&As</p>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <a href="#faq" class="quick-link-card">
+                    <i class="bi bi-question-circle"></i>
+                    <h4>FAQ</h4>
+                    <p>Common questions answered</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="help-section" id="getting-started">
+    <div class="container">
+        <h2 class="section-title mb-4">Getting Started with CANIA</h2>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h4>Create Your Account</h4>
+                    <p>Click "Join CANIA" in the navigation bar. Choose your role (Patient or Expert), fill in your details, and create a secure password. You'll need a valid email address.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h4>Verify & Login</h4>
+                    <p>After registration, you can immediately log in with your email and password. Make sure to remember your credentials or use the "Remember Me" option.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h4>Explore Your Dashboard</h4>
+                    <p>Once logged in, you'll see options based on your role. Patients can access the Scanner, CANIA Space, and My Journey. Experts can access the Expert Dashboard.</p>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="info-alert">
+                    <i class="bi bi-info-circle-fill"></i>
+                    <strong>Important:</strong> Choose the correct role during registration. Patients analyze scans and ask questions. Experts answer questions and add medical knowledge to the database.
+                </div>
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h4>Complete Your Profile</h4>
+                    <p>While optional, adding more information to your profile helps us provide better personalized recommendations and connect you with the right resources.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">5</div>
+                    <h4>Start Using CANIA</h4>
+                    <p>You're all set! Patients can upload their first X-ray or explore CANIA Space. Experts can start answering questions or adding Q&As to help patients.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="help-section bg-light" id="for-patients">
+    <div class="container">
+        <h2 class="section-title mb-4">Guide for Patients</h2>
+        <h3 class="fw-bold mb-3 mt-5">
+            <i class="bi bi-camera text-primary me-2"></i>
+            Using the AI Scanner
+        </h3>
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="step-card">
+                    <h4>Step 1: Navigate to Scanner</h4>
+                    <p>From your dashboard or main menu, click on "Scanner" or "Get Started" button.</p>
+                </div>
+                <div class="step-card">
+                    <h4>Step 2: Upload Your X-Ray</h4>
+                    <p>Click the upload area and select a chest X-ray image (JPG or PNG format). The image will appear in the upload box as a preview.</p>
+                </div>
+                <div class="step-card">
+                    <h4>Step 3: Execute Scan</h4>
+                    <p>Click "Execute Risk Detection Scan". The AI will analyze your image in seconds.</p>
+                </div>
+                <div class="step-card">
+                    <h4>Step 4: Review Results</h4>
+                    <p>You'll receive either a "High Risk" or "Low Risk" classification. HIGH RISK means patterns were detected - consult a radiologist immediately. LOW RISK means no concerning patterns were found, but continue regular check-ups.</p>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="info-alert">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <strong>Medical Disclaimer:</strong> CANIA provides preliminary screening only. Always consult with qualified medical professionals for diagnosis and treatment decisions.
+                </div>
+            </div>
+        </div>
+        <h3 class="fw-bold mb-3 mt-5">
+            <i class="bi bi-chat-heart text-primary me-2"></i>
+            Using CANIA Space
+        </h3>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="step-card">
+                    <h4>Search for Answers</h4>
+                    <p>Type keywords like "diet", "exercise", "sleep", "pain" into the search bar. CANIA will show you expert-verified Q&As matching your search.</p>
+                </div>
+                <div class="step-card">
+                    <h4>Ask Your Own Question</h4>
+                    <p>Can't find what you're looking for? Scroll down and submit your own question. Medical experts will be notified and will answer within 24-48 hours.</p>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="step-card">
+                    <h4>Get Notified</h4>
+                    <p>When an expert answers your question, you'll receive a notification (bell icon in the header). Click it to see your answer.</p>
+                </div>
+                <div class="step-card">
+                    <h4>View Full Answers</h4>
+                    <p>Click "Read Full Answer" on any search result to see the complete expert response and additional details.</p>
+                </div>
+            </div>
+        </div>
+        <h3 class="fw-bold mb-3 mt-5">
+            <i class="bi bi-journal-medical text-primary me-2"></i>
+            Tracking Your Journey
+        </h3>
+        <p class="text-secondary mb-3">Click "My Journey" to see a timeline of all your scans and results. Each entry shows the date, scan image, and AI prediction. This helps you and your doctor track changes over time.</p>
+    </div>
+</section>
+<section class="help-section" id="for-experts">
+    <div class="container">
+        <h2 class="section-title mb-4">Guide for Medical Experts</h2>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="step-card">
+                    <h4>
+                        <i class="bi bi-plus-circle text-success me-2"></i>
+                        Adding New Q&As
+                    </h4>
+                    <p><strong>1.</strong> Go to your Expert Dashboard<br>
+                    <strong>2.</strong> Fill in the "Add New Q&A" form:<br>
+                    &nbsp;&nbsp;&nbsp;• <strong>Question:</strong> Write the question patients might ask<br>
+                    &nbsp;&nbsp;&nbsp;• <strong>Keywords:</strong> Add searchable terms (comma-separated) like "diet, food, nutrition"<br>
+                    &nbsp;&nbsp;&nbsp;• <strong>Answer:</strong> Provide detailed, accurate medical guidance<br>
+                    <strong>3.</strong> Click "Add Q&A" - it's immediately searchable by patients!</p>
+                </div>
+                <div class="step-card">
+                    <h4>
+                        <i class="bi bi-reply text-primary me-2"></i>
+                        Answering Patient Questions
+                    </h4>
+                    <p><strong>1.</strong> Check "Unanswered Patient Questions" section<br>
+                    <strong>2.</strong> Click "Answer" on any question<br>
+                    <strong>3.</strong> Add keywords so future patients can find this answer<br>
+                    <strong>4.</strong> Write your expert answer<br>
+                    <strong>5.</strong> Submit - the patient gets notified automatically!</p>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="step-card">
+                    <h4>
+                        <i class="bi bi-lightbulb text-warning me-2"></i>
+                        Best Practices
+                    </h4>
+                    <p>
+                        • <strong>Be Clear:</strong> Use simple language patients can understand<br>
+                        • <strong>Be Complete:</strong> Provide thorough answers covering different aspects<br>
+                        • <strong>Be Accurate:</strong> Only provide information you're qualified to give<br>
+                        • <strong>Add Good Keywords:</strong> Think like a patient - what would they search?<br>
+                        • <strong>Stay Professional:</strong> Compassionate but medically sound advice
+                    </p>
+                </div>
+                <div class="info-alert">
+                    <i class="bi bi-shield-check-fill"></i>
+                    <strong>Note:</strong> As an expert, you have access to the Expert Dashboard and Q&A system only. You cannot access patient scans, journeys, or personal medical records to protect privacy.
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="help-section bg-light" id="faq">
+    <div class="container">
+        <h2 class="section-title mb-4">Frequently Asked Questions</h2>
+        <div class="accordion faq-accordion" id="faqAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                        Is CANIA's AI accurate?
+                    </button>
+                </h2>
+                <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        CANIA uses a DenseNet-121 model trained on thousands of chest X-rays with 93% recall and 79% accuracy in clinical testing. We prioritize high recall to ensure maximum sensitivity, minimizing missed detections so critical cases are caught early. However, AI is a <strong>screening tool</strong>, not a replacement for professional medical diagnosis. Always consult with a qualified radiologist or oncologist for definitive diagnosis and treatment.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                        Is my medical data safe and private?
+                    </button>
+                </h2>
+                <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Absolutely. All your data is encrypted and stored securely. We comply with international healthcare data protection standards. Your X-rays and results are only visible to you - not even experts can access your personal medical records. We never share your data with third parties without explicit consent.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                        How much does CANIA cost?
+                    </button>
+                </h2>
+                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        CANIA is currently <strong>free to use</strong> during our beta phase. We believe healthcare technology should be accessible to everyone. Future pricing models will be announced with advance notice, and we're committed to keeping essential features affordable.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                        Can I trust AI for cancer detection?
+                    </button>
+                </h2>
+                <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        AI is a powerful <strong>early screening tool</strong> that can detect patterns invisible to the human eye. Studies show AI can match or exceed human radiologists in pattern recognition. However, CANIA should be used as part of comprehensive care - never as your only diagnostic method. Think of it as a second opinion that prompts you to seek professional evaluation when needed.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                        What file formats are supported?
+                    </button>
+                </h2>
+                <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        CANIA accepts JPG and PNG image formats. For best results, ensure your X-ray image is clear, properly oriented (front view of chest), and at least 512x512 pixels. DICOM files are not currently supported but will be added in future updates.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
+                        How long does analysis take?
+                    </button>
+                </h2>
+                <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Analysis is near-instant, typically taking less than 10 seconds from upload to results. The AI processes your image immediately, and results appear on screen as soon as processing completes.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq7">
+                        Can I download my scan results?
+                    </button>
+                </h2>
+                <div id="faq7" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Yes! Navigate to "My Journey" to see all your past scans. You can view the results and take screenshots for your records. A formal PDF report download feature is coming in our next update.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq8">
+                        What if I disagree with the AI result?
+                    </button>
+                </h2>
+                <div id="faq8" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        AI is not infallible - it's a screening tool. If you receive a result that doesn't match your symptoms or expectations, <strong>always consult with a medical professional</strong>. They can order additional tests (CT scans, biopsies) for definitive diagnosis. Your health is too important to rely on any single test.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq9">
+                        How often should I get screened?
+                    </button>
+                </h2>
+                <div id="faq9" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Screening frequency depends on your risk factors (smoking history, age, family history, etc.). High-risk individuals might benefit from annual screening. Consult your doctor to create a personalized screening schedule. CANIA can be used as often as you have new X-rays to analyze.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq10">
+                        What if I need urgent medical help?
+                    </button>
+                </h2>
+                <div id="faq10" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        <strong>CANIA is not for emergencies.</strong> If you're experiencing severe chest pain, difficulty breathing, coughing up blood, or any medical emergency, call emergency services (911 or your local emergency number) immediately. CANIA Space is for general health questions, not urgent medical situations.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="help-section">
+    <div class="container">
+        <h2 class="section-title mb-4">Troubleshooting Common Issues</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="step-card">
+                    <h4>Can't Upload X-Ray Image</h4>
+                    <p>✓ Check file format (JPG or PNG only)<br>
+                    ✓ Ensure file size is under 10MB<br>
+                    ✓ Try a different browser<br>
+                    ✓ Clear browser cache and cookies</p>
+                </div>
+                <div class="step-card">
+                    <h4>Search Not Finding Answers</h4>
+                    <p>✓ Try different keywords<br>
+                    ✓ Use simpler, more general terms<br>
+                    ✓ Check spelling<br>
+                    ✓ Try single words instead of full questions</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="step-card">
+                    <h4>Not Receiving Notifications</h4>
+                    <p>✓ Ensure you're logged in<br>
+                    ✓ Check the bell icon in the header<br>
+                    ✓ Notifications appear after experts answer<br>
+                    ✓ Refresh the page to see new notifications</p>
+                </div>
+                <div class="step-card">
+                    <h4>Forgot Password</h4>
+                    <p>✓ Click "Forgot Password" on login page<br>
+                    ✓ Password reset feature coming soon<br>
+                    ✓ Contact support for immediate assistance<br>
+                    ✓ Use a password manager for future</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="help-section bg-light">
+    <div class="container">
+        <div class="support-box">
+            <h3>
+                <i class="bi bi-headset me-2"></i>
+                Still Need Help?
+            </h3>
+            <p class="mb-0">Our support team is here to assist you. Reach out via email and we'll respond within 24 hours.</p>
+            <div class="contact-links mt-4">
+                <a href="mailto:mohamex.mounib@gmail.com" class="contact-btn">
+                    <i class="bi bi-envelope-fill"></i>
+                    mohamex.mounib@gmail.com
+                </a>
+                <a href="mailto:mancer.haroon@gmail.com" class="contact-btn">
+                    <i class="bi bi-envelope-fill"></i>
+                    mancer.haroon@gmail.com
+                </a>
+                <a href="mailto:aminebonheur749@gmail.com" class="contact-btn">
+                    <i class="bi bi-envelope-fill"></i>
+                    aminebonheur749@gmail.com
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+// Simple help search functionality
+document.getElementById('helpSearch').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const sections = document.querySelectorAll('.step-card, .accordion-item');
+    sections.forEach(section => {
+        const text = section.textContent.toLowerCase();
+        if (text.includes(searchTerm) || searchTerm === '') {
+            section.style.display = '';
+        } else {
+            section.style.display = 'none';
+        }
+    });
+});
+</script>
+{% endblock %}

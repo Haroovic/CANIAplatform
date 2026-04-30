@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -40 920 680" width="100%" height="100%">
+  <defs>
+    <!-- Soft clinical gradient for lungs -->
+    <linearGradient id="lungGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#1d4ed8" stop-opacity="0.05"/>
+    </linearGradient>
+    
+    <!-- Grid Pattern -->
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#334155" stroke-width="0.5" opacity="0.3"/>
+    </pattern>
+  </defs>
+
+  <!-- Background Grid -->
+  <rect x="-100" y="-100" width="1000" height="800" fill="url(#grid)" />
+
+  <!-- Central Lung Structure -->
+  <g transform="translate(0, -20)">
+    <!-- Trachea -->
+    <path d="M 390,50 L 390,150 M 410,50 L 410,150" fill="none" stroke="#475569" stroke-width="4" stroke-linecap="round"/>
+    <!-- Left Bronchus -->
+    <path d="M 390,140 L 340,200 M 340,200 L 300,240 M 340,200 L 330,270" fill="none" stroke="#475569" stroke-width="3" stroke-linecap="round"/>
+    <!-- Right Bronchus -->
+    <path d="M 410,140 L 460,200 M 460,200 L 500,240 M 460,200 L 470,270" fill="none" stroke="#475569" stroke-width="3" stroke-linecap="round"/>
+    
+    <!-- Left Lung -->
+    <path d="M 360,150 C 330,100 240,150 220,250 C 200,350 200,450 240,530 C 280,560 350,530 380,480 C 400,430 380,250 360,150 Z" fill="url(#lungGradient)" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4 4" opacity="0.8"/>
+    
+    <!-- Right Lung -->
+    <path d="M 440,150 C 470,100 560,150 580,250 C 600,350 600,450 560,530 C 520,560 450,530 420,480 C 400,430 420,250 440,150 Z" fill="url(#lungGradient)" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4 4" opacity="0.8"/>
+  </g>
+
+  <!-- AI Analysis Scan Line -->
+  <line x1="180" y1="100" x2="620" y2="100" stroke="#38bdf8" stroke-width="2" opacity="0.5">
+    <animate attributeName="y1" values="80; 550; 80" dur="4s" repeatCount="indefinite"/>
+    <animate attributeName="y2" values="80; 550; 80" dur="4s" repeatCount="indefinite"/>
+  </line>
+  <polygon points="175,100 185,95 185,105" fill="#38bdf8">
+    <animate attributeName="points" values="175,80 185,75 185,85; 175,550 185,545 185,555; 175,80 185,75 185,85" dur="4s" repeatCount="indefinite"/>
+  </polygon>
+  <polygon points="625,100 615,95 615,105" fill="#38bdf8">
+    <animate attributeName="points" values="625,80 615,75 615,85; 625,550 615,545 615,555; 625,80 615,75 615,85" dur="4s" repeatCount="indefinite"/>
+  </polygon>
+
+  <!-- AI Detection Box (Red - Abnormal) -->
+  <g transform="translate(490, 240)">
+    <rect x="0" y="0" width="70" height="70" fill="#ef4444" opacity="0.1">
+      <animate attributeName="opacity" values="0.1; 0.25; 0.1" dur="2s" repeatCount="indefinite"/>
+    </rect>
+    <path d="M 0,15 L 0,0 L 15,0 M 55,0 L 70,0 L 70,15 M 0,55 L 0,70 L 15,70 M 55,70 L 70,70 L 70,55" fill="none" stroke="#ef4444" stroke-width="2"/>
+    <circle cx="35" cy="35" r="3" fill="#ef4444" />
+  </g>
+
+  <!-- Data Overlay for Abnormal Detection -->
+  <polyline points="560,275 610,275 630,250 760,250" fill="none" stroke="#475569" stroke-width="1.5"/>
+  <circle cx="560" cy="275" r="3" fill="#ef4444"/>
+  <circle cx="760" cy="250" r="3" fill="#475569"/>
+  
+  <g font-family="system-ui, -apple-system, sans-serif" font-size="12">
+    <rect x="630" y="190" width="140" height="52" fill="#0f172a" stroke="#1e293b" stroke-width="1" rx="4" opacity="0.9"/>
+    <text x="642" y="212" fill="#f8fafc" font-weight="700" letter-spacing="0.5">NODULE DETECTED</text>
+    <text x="642" y="228" fill="#94a3b8" font-size="11">Confidence: <tspan fill="#ef4444">93.8%</tspan></text>
+  </g>
+
+  <!-- AI Detection Box (Green - Clear) -->
+  <g transform="translate(250, 420)">
+    <rect x="0" y="0" width="50" height="50" fill="none" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4 2"/>
+    <circle cx="25" cy="25" r="3" fill="#10b981" />
+  </g>
+
+  <!-- Data Overlay for Clear Detection -->
+  <polyline points="250,445 190,445 170,420 40,420" fill="none" stroke="#475569" stroke-width="1.5"/>
+  <circle cx="250" cy="445" r="3" fill="#10b981"/>
+  <circle cx="40" cy="420" r="3" fill="#475569"/>
+
+  <g font-family="system-ui, -apple-system, sans-serif" font-size="12">
+    <rect x="30" y="360" width="140" height="52" fill="#0f172a" stroke="#1e293b" stroke-width="1" rx="4" opacity="0.9"/>
+    <text x="42" y="382" fill="#f8fafc" font-weight="700" letter-spacing="0.5">LOWER LOBE</text>
+    <text x="42" y="398" fill="#94a3b8" font-size="11">Status: <tspan fill="#10b981">CLEAR</tspan></text>
+  </g>
+
+</svg>

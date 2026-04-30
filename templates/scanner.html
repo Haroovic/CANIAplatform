@@ -1,0 +1,133 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+  .scanner-wrap { background:linear-gradient(180deg,#eff6ff 0%,#f8fafc 100%); min-height:80vh; display:flex; align-items:center; padding:48px 0; }
+  .scanner-card { max-width:780px; margin:0 auto; background:white; border-radius:24px; box-shadow:var(--shadow-xl); border:1px solid var(--gray-200); padding:48px; }
+  .scanner-icon { width:64px; height:64px; background:var(--primary-light); border-radius:18px; display:flex; align-items:center; justify-content:center; font-size:1.8rem; color:var(--primary); margin:0 auto 20px; }
+  .upload-zone {
+    border:2px dashed var(--gray-300); padding:44px 28px; border-radius:20px;
+    text-align:center; background:var(--gray-50); transition:all .3s; cursor:pointer;
+    min-height:240px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    overflow:hidden; position:relative;
+  }
+  .upload-zone:hover { border-color:var(--primary); background:var(--primary-light); }
+  .upload-zone.has-image .upload-placeholder { display:none; }
+  .upload-zone.has-image #previewImage { display:block; }
+  #previewImage { display:none; max-width:100%; max-height:320px; border-radius:12px; object-fit:contain; }
+  .upload-placeholder { display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .upload-placeholder i { font-size:2.8rem; color:var(--primary); }
+  .upload-placeholder p { color:var(--gray-600); font-weight:600; margin:0; font-size:.95rem; }
+  .upload-placeholder small { color:var(--gray-400); }
+  .btn-scan {
+    width:100%; padding:16px; background:var(--primary); border:none; color:white;
+    font-size:1.05rem; font-weight:700; border-radius:14px; cursor:pointer;
+    transition:.3s cubic-bezier(.175,.885,.32,1.275); display:flex; align-items:center;
+    justify-content:center; gap:10px; margin-top:24px;
+  }
+  .btn-scan:hover { background:var(--primary-dark); transform:translateY(-2px); box-shadow:0 10px 24px rgba(37,99,235,.25); }
+  .btn-scan:disabled { background:var(--gray-400); cursor:not-allowed; transform:none; box-shadow:none; }
+  .result-box { margin-top:28px; animation:fadeInUp .5s ease-out; }
+  .result-alert { display:flex; align-items:center; gap:20px; padding:24px; border-radius:16px; }
+  .risk-high { background:#fff1f2; border:1px solid #fecdd3; color:#9f1239; }
+  .risk-low  { background:#f0fdf4; border:1px solid #bbf7d0; color:#166534; }
+  .risk-icon { font-size:2.4rem; flex-shrink:0; }
+  .disclaimer { margin-top:16px; font-size:.83rem; color:var(--gray-400); background:var(--gray-50); padding:14px 18px; border-radius:12px; border-left:4px solid var(--gray-200); }
+  [data-theme="dark"] .scanner-wrap { background: #0f172a; }
+  [data-theme="dark"] .scanner-card { background: #1e293b; border-color: #334155; }
+  [data-theme="dark"] .scanner-card h1 { color: #f1f5f9 !important; }
+  [data-theme="dark"] .upload-zone { background: #0f172a; border-color: #334155; }
+  [data-theme="dark"] .upload-zone:hover { background: rgba(59,130,246,.15); border-color: var(--primary); }
+  [data-theme="dark"] .disclaimer { background: #0f172a; border-color: #334155; color: #94a3b8; }
+  [data-theme="dark"] .risk-high { background: rgba(159,18,57,.2); border-color: #881337; color: #fda4af; }
+  [data-theme="dark"] .risk-low { background: rgba(22,101,52,.2); border-color: #14532d; color: #86efac; }
+</style>
+<section class="scanner-wrap">
+  <div class="container">
+    <div class="scanner-card">
+      <div class="text-center mb-5">
+        <div class="scanner-icon"><i class="bi bi-person-bounding-box"></i></div>
+        <h1 class="fw-bold mb-1" style="font-size:1.75rem;color:var(--gray-900);">Lung Cancer Risk Detection</h1>
+        <p class="text-muted mb-0">AI-Driven X-Ray Image Analysis — upload your scan below</p>
+      </div>
+      <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()"
+           ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
+        <div class="upload-placeholder">
+          <i class="bi bi-cloud-arrow-up-fill"></i>
+          <p>Click or drag &amp; drop your chest X-Ray</p>
+          <small>Supports JPG, PNG — Max 10 MB</small>
+        </div>
+        <img id="previewImage" src="#" alt="X-ray preview" />
+        <input type="file" id="fileInput" style="display:none;" accept="image/*" onchange="handlePreview(this)" />
+      </div>
+      <button type="button" onclick="uploadAndScan()" class="btn-scan" id="scanBtn">
+        <i class="bi bi-cpu-fill"></i>
+        <span id="btnText">Execute Risk Detection Scan</span>
+      </button>
+      <div id="resultArea"></div>
+    </div>
+  </div>
+</section>
+<script>
+function handlePreview(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('previewImage').src = e.target.result;
+      document.getElementById('dropZone').classList.add('has-image');
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+function handleDragOver(e) { e.preventDefault(); document.getElementById('dropZone').style.borderColor='var(--primary)'; }
+function handleDrop(e) {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    document.getElementById('fileInput').files = e.dataTransfer.files;
+    handlePreview(document.getElementById('fileInput'));
+  }
+}
+async function uploadAndScan() {
+  const fileInput = document.getElementById('fileInput');
+  const scanBtn   = document.getElementById('scanBtn');
+  const btnText   = document.getElementById('btnText');
+  const resultArea = document.getElementById('resultArea');
+  if (!fileInput.files[0]) { alert('Please select an X-ray image first.'); return; }
+  scanBtn.disabled = true;
+  btnText.innerText = 'Analysing Neural Networks…';
+  resultArea.innerHTML = `<div class="text-center mt-4 py-3"><div class="spinner-border text-primary"></div><p class="text-muted mt-2 small">Processing your scan…</p></div>`;
+  const fd = new FormData();
+  fd.append('file', fileInput.files[0]);
+  try {
+    const res  = await fetch("{{ url_for('upload') }}", { method:'POST', body:fd });
+    const data = await res.json();
+    if (data.status === 'success') {
+      const isHigh = data.prediction === '1';
+      resultArea.innerHTML = `
+        <div class="result-box">
+          <div class="result-alert ${isHigh ? 'risk-high' : 'risk-low'}">
+            <div class="risk-icon"><i class="bi bi-${isHigh ? 'exclamation-triangle-fill' : 'check-circle-fill'}"></i></div>
+            <div>
+              <h5 class="fw-bold mb-1">${isHigh ? 'Attention: High Risk Patterns Detected' : 'Clear: Low Risk Patterns'}</h5>
+              <p class="mb-0 small">${isHigh
+                ? 'Our AI has detected unusual patterns in your X-ray that warrant further evaluation. Please consult a professional radiologist as soon as possible.'
+                : 'No concerning signs were found in your scan. Results appear normal. Continue regular check-ups with your physician.'}</p>
+            </div>
+          </div>
+          <div class="disclaimer">
+            <strong>Note:</strong> This report is generated by an AI model for preliminary screening support only.
+            It does not constitute a formal medical diagnosis. <strong>CANIA</strong> is just one part of your health journey.
+          </div>
+        </div>`;
+    } else {
+      resultArea.innerHTML = `<div class="alert alert-danger mt-3 rounded-3"><i class="bi bi-x-circle me-2"></i>${data.message}</div>`;
+    }
+  } catch (err) {
+    resultArea.innerHTML = `<div class="alert alert-danger mt-3 rounded-3"><i class="bi bi-x-circle me-2"></i>A server error occurred. Please try again.</div>`;
+  } finally {
+    scanBtn.disabled = false;
+    btnText.innerText = 'Execute Risk Detection Scan';
+  }
+}
+</script>
+{% endblock %}

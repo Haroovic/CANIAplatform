@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+  .notif-page { background:var(--gray-50); min-height:80vh; padding:52px 0; }
+  .notif-wrap  { max-width:780px; margin:0 auto; }
+  .notif-header { background:white; border-radius:20px 20px 0 0; padding:28px 32px; border-bottom:1px solid var(--gray-200); display:flex; align-items:center; justify-content:space-between; }
+  .notif-header h2 { font-weight:800; font-size:1.4rem; color:var(--gray-900); margin:0; }
+  .notif-header p  { font-size:.85rem; color:var(--gray-400); margin:0; }
+  .notif-count-chip { background:var(--primary-light); color:var(--primary); border-radius:50px; padding:4px 12px; font-size:.78rem; font-weight:700; }
+  .notif-card { background:white; border-bottom:1px solid var(--gray-100); padding:22px 32px; transition:.2s; display:flex; align-items:flex-start; gap:16px; }
+  .notif-card:last-child { border-bottom:none; border-radius:0 0 20px 20px; }
+  .notif-card:hover { background:var(--gray-50); }
+  .notif-card.unread { background:linear-gradient(90deg,#eff6ff 0%,white 40%); border-left:4px solid var(--primary); }
+  .notif-card.unread .notif-icon { background:var(--primary); color:white; }
+  .notif-icon { width:44px; height:44px; border-radius:50%; background:var(--gray-100); color:var(--gray-500); display:flex; align-items:center; justify-content:center; font-size:1.15rem; flex-shrink:0; }
+  .notif-msg  { font-size:.93rem; color:var(--gray-800); font-weight:500; margin-bottom:4px; }
+  .notif-time { font-size:.8rem; color:var(--gray-400); }
+  .notif-link { color:var(--primary); font-weight:600; font-size:.85rem; text-decoration:none; }
+  .notif-link:hover { text-decoration:underline; }
+  .unread-badge { width:8px; height:8px; background:var(--primary); border-radius:50%; flex-shrink:0; margin-top:6px; }
+  .empty-box { background:white; border-radius:20px; padding:64px 24px; text-align:center; }
+  .notif-outer-card { border-radius:20px; box-shadow:var(--shadow-md); overflow:hidden; border:1px solid var(--gray-200); }
+  [data-theme="dark"] .notif-page { background: #0f172a; }
+  [data-theme="dark"] .notif-header { background: #1e293b; border-color: #334155; }
+  [data-theme="dark"] .notif-header h2 { color: #f1f5f9; }
+  [data-theme="dark"] .notif-card { background: #1e293b; border-color: #334155; }
+  [data-theme="dark"] .notif-card:hover { background: #162032; }
+  [data-theme="dark"] .notif-card.unread { background: linear-gradient(90deg, rgba(37,99,235,.1) 0%, #1e293b 40%); border-left-color: var(--primary); }
+  [data-theme="dark"] .notif-icon { background: #0f172a; color: #94a3b8; }
+  [data-theme="dark"] .notif-msg { color: #e2e8f0; }
+  [data-theme="dark"] .notif-outer-card { border-color: #334155; }
+  [data-theme="dark"] .empty-box { background: #1e293b; }
+</style>
+<div class="notif-page">
+  <div class="container">
+    <div class="notif-wrap">
+      <div class="notif-outer-card">
+        <div class="notif-header">
+          <div>
+            <h2><i class="bi bi-bell-fill me-2 text-primary"></i>Notifications</h2>
+            <p>Stay updated with your CANIA activity</p>
+          </div>
+          {% if notifications %}
+          <span class="notif-count-chip">{{ notifications|length }} total</span>
+          {% endif %}
+        </div>
+        {% if notifications %}
+          {% for notif in notifications %}
+          <div class="notif-card {% if not notif.is_read %}unread{% endif %}">
+            <div class="notif-icon">
+              <i class="bi bi-{% if not notif.is_read %}chat-dots-fill{% else %}chat-dots{% endif %}"></i>
+            </div>
+            <div class="flex-grow-1">
+              <div class="notif-msg">{{ notif.message }}</div>
+              <div class="notif-time"><i class="bi bi-clock me-1"></i>{{ notif.date_created.strftime('%B %d, %Y at %I:%M %p') }}</div>
+              {% if notif.link %}
+                <a href="{{ notif.link }}" class="notif-link mt-1 d-inline-block">View Details <i class="bi bi-arrow-right"></i></a>
+              {% endif %}
+            </div>
+            {% if not notif.is_read %}
+            <div class="unread-badge" title="Unread"></div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-box">
+            <i class="bi bi-bell-slash text-muted d-block mb-3" style="font-size:3.2rem;"></i>
+            <h5 class="fw-bold">No Notifications Yet</h5>
+            <p class="text-muted mb-0">You're all caught up! Check back after your next scan or question.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+  .answer-page { background:var(--gray-50); min-height:80vh; padding:52px 0; }
+  .answer-card { background:white; border-radius:24px; box-shadow:var(--shadow-lg); border:1px solid var(--gray-200); overflow:hidden; max-width:780px; margin:0 auto; }
+  .answer-card-header { background:linear-gradient(135deg,#064e3b 0%,#059669 100%); color:white; padding:32px 36px; }
+  .answer-card-header h2 { font-weight:800; font-size:1.4rem; margin:0 0 6px; }
+  .question-bubble { background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.2); border-radius:12px; padding:16px 20px; margin-top:16px; font-size:.95rem; line-height:1.65; color:rgba(255,255,255,.9); }
+  .answer-card-body { padding:36px; }
+  .btn-expert { background:#059669; color:white; border:none; padding:13px 32px; border-radius:50px; font-weight:700; cursor:pointer; transition:.25s; font-size:1rem; }
+  .btn-expert:hover { background:#047857; transform:translateY(-2px); box-shadow:0 6px 18px rgba(5,150,105,.3); color:white; }
+  .form-control { border:1.5px solid var(--gray-200); border-radius:12px; transition:.2s; }
+  .form-control:focus { border-color:#059669; box-shadow:0 0 0 3px rgba(5,150,105,.15); }
+  [data-theme="dark"] .answer-page { background: #0f172a; }
+  [data-theme="dark"] .answer-card { background: #1e293b; border-color: #334155; }
+  [data-theme="dark"] .form-control { background: #0f172a; border-color: #334155; color: #f8fafc; }
+  [data-theme="dark"] .form-label { color: #cbd5e1; }
+  [data-theme="dark"] .form-text { color: #94a3b8; }
+</style>
+<div class="answer-page">
+  <div class="container">
+    <div class="answer-card">
+      <div class="answer-card-header">
+        <p class="mb-2 small text-uppercase fw-semibold" style="color:rgba(255,255,255,.65);letter-spacing:.5px;">
+          <i class="bi bi-reply-fill me-1"></i> Answering Patient Question
+        </p>
+        <h2>Submit Your Expert Answer</h2>
+        <div class="question-bubble">
+          <i class="bi bi-chat-left-quote-fill me-2" style="opacity:.7;"></i>
+          {{ question.question_text }}
+        </div>
+      </div>
+      <div class="answer-card-body">
+        <form method="POST" id="answerForm">
+          {{ form.hidden_tag() }}
+          <div class="mb-4" style="display:none;">
+            {{ form.question_text(id="answerQuestion") }}
+          </div>
+          <div class="mb-4">
+            {{ form.keywords.label(class="form-label") }}
+            {% if form.keywords.errors %}
+              {{ form.keywords(class="form-control is-invalid", placeholder="e.g. lung, symptoms, smoking, diet", id="answerKeywords") }}
+              <div class="invalid-feedback">{% for e in form.keywords.errors %}<span>{{ e }}</span>{% endfor %}</div>
+            {% else %}
+              {{ form.keywords(class="form-control", placeholder="e.g. lung, symptoms, smoking, diet", id="answerKeywords") }}
+            {% endif %}
+            <div class="form-text"><i class="bi bi-info-circle me-1"></i>Comma-separated keywords help patients find this Q&amp;A via search.</div>
+          </div>
+          <div class="mb-4">
+            {{ form.answer_text.label(class="form-label") }}
+            {% if form.answer_text.errors %}
+              {{ form.answer_text(class="form-control is-invalid", rows="7", placeholder="Write a detailed, evidence-based answer…", id="answerText") }}
+              <div class="invalid-feedback">{% for e in form.answer_text.errors %}<span>{{ e }}</span>{% endfor %}</div>
+            {% else %}
+              {{ form.answer_text(class="form-control", rows="7", placeholder="Write a detailed, evidence-based answer…", id="answerText") }}
+            {% endif %}
+          </div>
+          <div class="d-flex gap-3 flex-wrap">
+            {{ form.submit(class="btn-expert", id="submitAnswer") }}
+            <a href="{{ url_for('expert_dashboard') }}" class="btn btn-outline-secondary rounded-pill px-4 fw-semibold">
+              <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

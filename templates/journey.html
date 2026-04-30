@@ -1,0 +1,107 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+  .journey-page { background:var(--gray-50); min-height:100vh; padding:56px 0; }
+  .journey-header { text-align:center; margin-bottom:52px; }
+  .journey-header h1 { font-weight:900; font-size:2rem; color:var(--gray-900); letter-spacing:-.5px; }
+  .journey-header p  { color:var(--gray-500); font-size:.95rem; }
+  .timeline { position:relative; max-width:820px; margin:0 auto; padding-left:44px; }
+  .timeline::before {
+    content:''; position:absolute; left:20px; top:0; bottom:0; width:2px;
+    background:linear-gradient(180deg, var(--primary) 0%, var(--gray-200) 100%);
+  }
+  .tl-item { position:relative; margin-bottom:28px; }
+  .tl-dot {
+    position:absolute; left:-32px; top:28px;
+    width:20px; height:20px; border-radius:50%;
+    background:white; border:3px solid var(--primary); z-index:2;
+    box-shadow:0 0 0 4px var(--primary-light);
+  }
+  .diag-card {
+    background:white; border:1px solid var(--gray-200); border-radius:18px;
+    display:flex; overflow:hidden; transition:.3s;
+    box-shadow:var(--shadow-sm);
+  }
+  .diag-card:hover { transform:translateX(8px); border-color:var(--primary); box-shadow:var(--shadow-md); }
+  .scan-img {
+    width:180px; min-height:180px; background:#000;
+    flex-shrink:0; position:relative; overflow:hidden;
+  }
+  .scan-img img { width:100%; height:100%; object-fit:contain; background:#000; }
+  .scan-img::after {
+    content:''; position:absolute; left:0; top:0; width:100%; height:2px;
+    background:#00f2ff; box-shadow:0 0 10px #00f2ff;
+    animation:scanLine 2.5s linear infinite;
+  }
+  @keyframes scanLine { 0%{top:0} 100%{top:100%} }
+  .diag-body { padding:22px 26px; display:flex; flex-direction:column; justify-content:center; flex-grow:1; }
+  .diag-date { font-size:.72rem; font-weight:700; color:var(--gray-400); text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px; }
+  .diag-title { font-size:1.05rem; font-weight:800; color:var(--gray-800); margin-bottom:10px; }
+  .result-badge { display:inline-flex; align-items:center; gap:5px; font-size:.78rem; font-weight:800; padding:4px 12px; border-radius:6px; margin-bottom:10px; width:fit-content; }
+  .badge-pos { background:#fff1f2; color:#be123c; }
+  .badge-neg { background:#f0fdf4; color:#15803d; }
+  .diag-note  { font-size:.85rem; color:var(--gray-500); line-height:1.5; margin:0; }
+  .empty-state { text-align:center; background:white; border:2px dashed var(--gray-200); border-radius:20px; padding:64px 24px; max-width:500px; margin:0 auto; }
+  @media(max-width:640px) {
+    .diag-card { flex-direction:column; }
+    .scan-img  { width:100%; height:200px; }
+  }
+  [data-theme="dark"] .journey-page { background: #0f172a; }
+  [data-theme="dark"] .diag-card { background: #1e293b; border-color: #334155; }
+  [data-theme="dark"] .tl-dot { background: #1e293b; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(59,130,246,.15); }
+  [data-theme="dark"] .empty-state { background: #1e293b; border-color: #334155; }
+  [data-theme="dark"] .diag-title { color: #f1f5f9; }
+  [data-theme="dark"] .journey-header h1 { color: #f1f5f9; }
+  [data-theme="dark"] .badge-pos { background: rgba(190,18,60,.2); color: #fda4af; }
+  [data-theme="dark"] .badge-neg { background: rgba(21,128,61,.2); color: #86efac; }
+  [data-theme="dark"] .timeline::before { background: linear-gradient(180deg, var(--primary) 0%, #334155 100%); }
+</style>
+<div class="journey-page">
+  <div class="container">
+    <div class="journey-header">
+      <div style="display:inline-flex;align-items:center;gap:8px;background:var(--primary-light);color:var(--primary);border-radius:50px;padding:6px 18px;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;">
+        <i class="bi bi-journal-medical"></i> Clinical History
+      </div>
+      <h1>My Diagnostic Journey</h1>
+    </div>
+    <div class="timeline">
+      {% if documents %}
+        {% for doc in documents %}
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="diag-card">
+            <div class="scan-img">
+              <img src="{{ url_for('static', filename='uploads/' + doc.file_path) }}" alt="Chest X-Ray" />
+            </div>
+            <div class="diag-body">
+              <div class="diag-date">
+                <i class="bi bi-clock me-1"></i>{{ doc.date_posted.strftime('%d %b %Y · %H:%M') }}
+              </div>
+              <div class="diag-title">
+                Pulmonary Report: {% if doc.prediction == '1' %}POSITIVE{% else %}NEGATIVE{% endif %}
+              </div>
+              {% if doc.prediction == '1' %}
+                <div class="result-badge badge-pos"><i class="bi bi-exclamation-triangle-fill"></i> ACTION REQUIRED</div>
+                <p class="diag-note">AI detected structural markers suggesting anomaly. Radiologist review strongly recommended.</p>
+              {% else %}
+                <div class="result-badge badge-neg"><i class="bi bi-shield-check"></i> NORMAL</div>
+                <p class="diag-note">Clear scan. No focal abnormalities detected in this session.</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <i class="bi bi-calendar2-x text-muted d-block mb-3" style="font-size:3.2rem;"></i>
+          <h5 class="fw-bold">No Scans Yet</h5>
+          <p class="text-muted mb-4">Upload your first chest X-ray to begin your diagnostic journey.</p>
+          <a href="{{ url_for('scanner') }}" class="btn btn-primary rounded-pill px-5">
+            <i class="bi bi-cpu me-2"></i>Start First Scan
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

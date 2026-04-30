@@ -1,0 +1,133 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+  .dash-hero { background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%); color:white; padding:52px 0; }
+  [data-theme="dark"] .dash-hero { background:linear-gradient(135deg,#070f1e 0%,#0f172a 100%); }
+  .dash-hero h1 { font-weight:900; font-size:2rem; letter-spacing:-.5px; }
+  .user-info-chip {
+    display:inline-flex; align-items:center; gap:10px;
+    background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2);
+    border-radius:50px; padding:8px 18px; font-size:.88rem; margin-bottom:14px;
+  }
+  .user-avatar {
+    width:38px; height:38px; border-radius:50%;
+    background:var(--primary); display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:1rem; color:white; flex-shrink:0;
+  }
+  .stat-card { background:white; border:1px solid var(--gray-200); border-radius:20px; padding:28px 24px; text-align:center; box-shadow:var(--shadow-sm); transition:all .25s; }
+  [data-theme="dark"] .stat-card { background:#1e293b; border-color:#334155; }
+  .stat-card:hover { transform:translateY(-5px); box-shadow:var(--shadow-lg); }
+  .stat-icon { width:56px; height:56px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:1.5rem; margin:0 auto 14px; }
+  .stat-number { font-size:2.4rem; font-weight:900; letter-spacing:-1px; }
+  .stat-label { color:var(--gray-500); font-size:.85rem; font-weight:600; text-transform:uppercase; letter-spacing:.4px; margin-top:4px; }
+  .section-title-sm { font-weight:800; font-size:1.25rem; color:var(--gray-800); }
+  [data-theme="dark"] .section-title-sm { color:#e2e8f0; }
+  .table thead th { background:var(--gray-50); color:var(--gray-500); font-weight:700; font-size:.8rem; text-transform:uppercase; letter-spacing:.5px; border:none; padding:14px 16px; }
+  [data-theme="dark"] .table thead th { background:#1e293b; }
+  .table tbody td { padding:16px; vertical-align:middle; border-color:var(--gray-100); }
+  [data-theme="dark"] .table tbody td { border-color:#334155; color:#cbd5e1; }
+  .q-text { font-weight:600; color:var(--gray-800); font-size:.92rem; }
+  [data-theme="dark"] .q-text { color:#e2e8f0; }
+  .empty-box { background:white; border:2px dashed var(--gray-200); border-radius:20px; padding:60px 20px; text-align:center; }
+  [data-theme="dark"] .empty-box { background:#1e293b; border-color:#334155; }
+  [data-theme="dark"] .stat-icon[style*="background:#eff6ff;"] { background: rgba(59,130,246,.15) !important; }
+  [data-theme="dark"] .stat-icon[style*="background:#ecfdf5;"] { background: rgba(5,150,105,.15) !important; }
+  [data-theme="dark"] .stat-icon[style*="background:#fffbeb;"] { background: rgba(217,119,6,.15) !important; }
+  [data-theme="dark"] .table { --bs-table-bg: transparent; }
+  [data-theme="dark"] .table tbody tr:hover { background: rgba(255,255,255,.03); }
+  [data-theme="dark"] .bg-pending { background: rgba(217,119,6,.15) !important; color: #fcd34d !important; }
+  [data-theme="dark"] .bg-answered { background: rgba(5,150,105,.15) !important; color: #6ee7b7 !important; }
+  [data-theme="dark"] .table td button:disabled { background: #0f172a !important; color: #64748b !important; }
+</style>
+<div class="dash-hero">
+  <div class="container">
+    <div class="user-info-chip">
+      <div class="user-avatar">{{ current_user.fname[0] }}{{ current_user.lname[0] }}</div>
+      <div>
+        <div style="font-weight:700;font-size:.9rem;">{{ current_user.fname }} {{ current_user.lname }}</div>
+        <div style="font-size:.75rem;opacity:.65;">{{ current_user.email }} &nbsp;·&nbsp;
+          {% if current_user.role == 'patient' %}<i class="bi bi-person-heart me-1"></i>Patient
+          {% else %}<i class="bi bi-patch-check me-1"></i>Expert{% endif %}
+        </div>
+      </div>
+    </div>
+    <h1><span data-i18n="dash.welcome">Welcome back,</span> {{ current_user.fname }}!</h1>
+    <p class="mb-0" style="color:rgba(255,255,255,.65);" data-i18n="dash.sub">Track your health progress and expert consultations.</p>
+  </div>
+</div>
+<div class="container py-5">
+  <div class="row g-4 mb-5">
+    <div class="col-md-6 col-lg-4">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#eff6ff;"><i class="bi bi-lungs text-primary"></i></div>
+        <div class="stat-number text-primary">{{ scan_count }}</div>
+        <div class="stat-label" data-i18n="dash.scans">Diagnostic Scans</div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#ecfdf5;"><i class="bi bi-patch-question-fill" style="color:#059669;"></i></div>
+        <div class="stat-number" style="color:#059669;">{{ questions|length }}</div>
+        <div class="stat-label" data-i18n="dash.consult">Expert Consultations</div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-4">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#fffbeb;"><i class="bi bi-check2-all" style="color:#d97706;"></i></div>
+        <div class="stat-number" style="color:#d97706;">{{ questions|selectattr('is_answered','equalto',True)|list|length }}</div>
+        <div class="stat-label" data-i18n="dash.answered">Answered</div>
+      </div>
+    </div>
+  </div>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="section-title-sm mb-0">
+      <i class="bi bi-clock-history me-2 text-primary"></i>
+      <span data-i18n="dash.history">Your Consultation History</span>
+    </h3>
+  </div>
+  {% if questions %}
+  <div class="card border-0 shadow-sm rounded-4 overflow-hidden p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th class="ps-4" data-i18n="dash.date">Date Submitted</th>
+            <th data-i18n="dash.question">Question</th>
+            <th data-i18n="dash.status">Status</th>
+            <th class="text-end pe-4" data-i18n="dash.action">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for q in questions %}
+          <tr>
+            <td class="ps-4 text-muted small" style="white-space:nowrap;">{{ q.date_posted.strftime('%b %d, %Y') }}</td>
+            <td><div class="q-text">{{ q.question_text[:80] }}{% if q.question_text|length > 80 %}…{% endif %}</div></td>
+            <td>
+              {% if q.is_answered %}
+                <span class="status-badge bg-answered"><i class="bi bi-check-circle-fill"></i><span data-i18n="status.answered">Answered</span></span>
+              {% else %}
+                <span class="status-badge bg-pending"><i class="bi bi-hourglass-split"></i><span data-i18n="status.pending">Pending</span></span>
+              {% endif %}
+            </td>
+            <td class="text-end pe-4">
+              {% if q.is_answered %}
+                <a href="{{ url_for('view_question', question_id=q.id) }}" class="btn btn-primary btn-sm rounded-pill px-3" data-i18n="dash.view">View Answer</a>
+              {% else %}
+                <button class="btn btn-sm rounded-pill px-3" style="background:var(--gray-100);color:var(--gray-500);" disabled data-i18n="dash.waiting">Waiting</button>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+  <div class="empty-box">
+    <i class="bi bi-inbox text-muted mb-3" style="font-size:3rem;display:block;"></i>
+    <h5 class="fw-bold" data-i18n="dash.empty">You haven't asked any questions yet.</h5>
+    <p class="text-muted mb-0">Head over to CANIA Space to ask your first question.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,148 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+  .auth-page { min-height:calc(100vh - 72px); display:flex; align-items:center; background:linear-gradient(135deg,var(--gray-50) 0%,#e0eaff 100%); padding:48px 0; }
+  .auth-card { background:white; border-radius:24px; box-shadow:var(--shadow-xl); border:1px solid var(--gray-200); overflow:hidden; }
+  .auth-card-left { background:linear-gradient(160deg,#0f4c81 0%,#1d4ed8 100%); padding:48px 36px; color:white; display:flex; flex-direction:column; justify-content:center; }
+  .auth-card-right { padding:44px; }
+  .auth-icon { width:52px; height:52px; border-radius:14px; background:rgba(255,255,255,.15); display:flex; align-items:center; justify-content:center; font-size:1.5rem; margin-bottom:24px; }
+  .auth-card-left h2 { font-weight:800; font-size:1.6rem; letter-spacing:-.4px; margin-bottom:10px; }
+  .auth-card-left p  { color:rgba(255,255,255,.72); font-size:.88rem; line-height:1.7; }
+  .auth-feature { display:flex; align-items:center; gap:10px; margin-top:14px; font-size:.85rem; color:rgba(255,255,255,.82); }
+  .auth-feature i { color:#93c5fd; }
+  .auth-divider { position:relative; text-align:center; margin:18px 0; }
+  .auth-divider::before { content:''; position:absolute; top:50%; left:0; right:0; height:1px; background:var(--gray-200); }
+  .auth-divider span { position:relative; background:white; padding:0 12px; color:var(--gray-400); font-size:.82rem; }
+  .role-selector { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .role-option { border:2px solid var(--gray-200); border-radius:12px; padding:14px; cursor:pointer; transition:all .2s; text-align:center; }
+  .role-option:hover { border-color:var(--primary); background:var(--primary-light); }
+  .role-option input { display:none; }
+  .role-option.selected { border-color:var(--primary); background:var(--primary-light); }
+  .role-option i { display:block; font-size:1.6rem; margin-bottom:6px; }
+  .role-option span { font-weight:700; font-size:.88rem; color:var(--gray-700); }
+  [data-theme="dark"] .auth-page { background: #0f172a; }
+  [data-theme="dark"] .auth-card { background: #1e293b; border-color: #334155; }
+  [data-theme="dark"] .auth-card-left { background: linear-gradient(160deg,#0f172a 0%,#1e3a5f 100%); }
+  [data-theme="dark"] .auth-card-right h3 { color: #f1f5f9 !important; }
+  [data-theme="dark"] .auth-divider span { background: #1e293b; color: #94a3b8; }
+  [data-theme="dark"] .auth-divider::before { background: #334155; }
+  [data-theme="dark"] .role-option { border-color: #334155; }
+  [data-theme="dark"] .role-option span { color: #cbd5e1; }
+</style>
+<div class="auth-page">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-xl-10 col-lg-11">
+        <div class="auth-card">
+          <div class="row g-0">
+            <div class="col-lg-4 d-none d-lg-flex auth-card-left">
+              <div>
+                <div class="auth-icon"><i class="bi bi-person-plus-fill"></i></div>
+                <h2>Join the CANIA Community</h2>
+                <p>Create a free account and start your AI-powered health journey today.</p>
+                <div class="auth-feature"><i class="bi bi-heart-pulse-fill"></i> Instant AI chest scan results</div>
+                <div class="auth-feature"><i class="bi bi-people-fill"></i> Expert medical consultations</div>
+                <div class="auth-feature"><i class="bi bi-graph-up-arrow"></i> Track your health over time</div>
+                <div class="auth-feature"><i class="bi bi-shield-check-fill"></i> End-to-end secure platform</div>
+              </div>
+            </div>
+            <div class="col-lg-8">
+              <div class="auth-card-right">
+                <div class="mb-4">
+                  <h3 style="font-weight:800;color:var(--gray-900);" class="mb-1">Create Your Account</h3>
+                  <p class="text-muted small mb-0">Fill in your details to get started</p>
+                </div>
+                <form method="POST" novalidate>
+                  {{ form.hidden_tag() }}
+                  <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                      {{ form.fname.label(class="form-label") }}
+                      {% if form.fname.errors %}
+                        {{ form.fname(class="form-control form-control-lg is-invalid", placeholder="First name", id="fname") }}
+                        <div class="invalid-feedback">{% for e in form.fname.errors %}<span>{{ e }}</span>{% endfor %}</div>
+                      {% else %}
+                        {{ form.fname(class="form-control form-control-lg", placeholder="First name", id="fname") }}
+                      {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                      {{ form.lname.label(class="form-label") }}
+                      {% if form.lname.errors %}
+                        {{ form.lname(class="form-control form-control-lg is-invalid", placeholder="Last name", id="lname") }}
+                        <div class="invalid-feedback">{% for e in form.lname.errors %}<span>{{ e }}</span>{% endfor %}</div>
+                      {% else %}
+                        {{ form.lname(class="form-control form-control-lg", placeholder="Last name", id="lname") }}
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                      {{ form.username.label(class="form-label") }}
+                      {% if form.username.errors %}
+                        {{ form.username(class="form-control form-control-lg is-invalid", placeholder="@username", id="username") }}
+                        <div class="invalid-feedback">{% for e in form.username.errors %}<span>{{ e }}</span>{% endfor %}</div>
+                      {% else %}
+                        {{ form.username(class="form-control form-control-lg", placeholder="@username", id="username") }}
+                      {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                      {{ form.email.label(class="form-label") }}
+                      {% if form.email.errors %}
+                        {{ form.email(class="form-control form-control-lg is-invalid", placeholder="your@email.com", id="regEmail") }}
+                        <div class="invalid-feedback">{% for e in form.email.errors %}<span>{{ e }}</span>{% endfor %}</div>
+                      {% else %}
+                        {{ form.email(class="form-control form-control-lg", placeholder="your@email.com", id="regEmail") }}
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                      {{ form.password.label(class="form-label") }}
+                      {% if form.password.errors %}
+                        {{ form.password(class="form-control form-control-lg is-invalid", placeholder="••••••••", id="regPassword") }}
+                        <div class="invalid-feedback">{% for e in form.password.errors %}<span>{{ e }}</span>{% endfor %}</div>
+                      {% else %}
+                        {{ form.password(class="form-control form-control-lg", placeholder="••••••••", id="regPassword") }}
+                      {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                      {{ form.confirm_password.label(class="form-label") }}
+                      {% if form.confirm_password.errors %}
+                        {{ form.confirm_password(class="form-control form-control-lg is-invalid", placeholder="••••••••", id="confirmPassword") }}
+                        <div class="invalid-feedback">{% for e in form.confirm_password.errors %}<span>{{ e }}</span>{% endfor %}</div>
+                      {% else %}
+                        {{ form.confirm_password(class="form-control form-control-lg", placeholder="••••••••", id="confirmPassword") }}
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="mb-4">
+                    {{ form.role.label(class="form-label") }}
+                    {% if form.role.errors %}
+                      {{ form.role(class="form-select form-select-lg is-invalid", id="roleSelect") }}
+                      <div class="invalid-feedback">{% for e in form.role.errors %}<span>{{ e }}</span>{% endfor %}</div>
+                    {% else %}
+                      {{ form.role(class="form-select form-select-lg", id="roleSelect") }}
+                    {% endif %}
+                    <div class="form-text"><i class="bi bi-info-circle me-1"></i>Patients can scan X-rays; Experts can answer questions.</div>
+                  </div>
+                  <div class="d-grid mb-3">
+                    {{ form.submit(class="btn btn-primary btn-lg fw-semibold py-3", id="registerBtn") }}
+                  </div>
+                </form>
+                <div class="auth-divider"><span>Already registered?</span></div>
+                <div class="text-center">
+                  <a href="{{ url_for('login') }}" class="btn btn-outline-primary w-100 fw-semibold py-2" id="goLogin">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Sign In Instead
+                  </a>
+                </div>
+                <p class="text-center text-muted mt-4 mb-0" style="font-size:.78rem;">
+                  <i class="bi bi-shield-lock-fill me-1"></i>Your information is encrypted and confidential
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
